@@ -1,0 +1,35 @@
+# now we can say "from MLSF.defense import defense" instead of "from MLSF.defense.defense import defense"
+#from MLSF.defense.defense import defense
+# if we import all of our modules here, we can import them directly from the other classes too
+
+
+# for file in directory that is .py:
+#   from file import *
+import sys
+import os, inspect
+from importlib import import_module as imp
+
+#print os.path.realpath(__file__)
+#print os.getcwd()
+
+# do not import these file names
+ignore = [ '__init__.py' ]
+
+exports = {}
+
+# import names that end with py, which are not in ignore list
+moduleList = [ mod for mod in os.listdir( os.path.dirname( __file__ ) )
+                   if mod not in ignore
+                   and mod[ -2: ] == 'py' ]
+
+for mod in moduleList:
+    try:
+        module =  imp( '%s.%s' % ( __name__, mod.rstrip( '.pyc' ) ) )
+        for name, attr in inspect.getmembers( module ):
+            if inspect.isclass( attr ):
+                exports[ name ] = attr
+    except ImportError  as msg:
+        print msg
+
+globals().update( exports )
+
